@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>Giftastic</title>
+</head>
+<body>
+	<div class="wrapper">
+		<h1>Giftastic</h1>
+
+		<div id="buttons-area"></div>
+
+		<form id="gif-adder">
+			<label for="gifAdd">Add your own gif, My Guy</label>
+			<input type="text" id="gifAdd">
+			<br>
+			<input id="addGif" type="submit" value="Add Gif">
+		</form>
+
+		<div id="gifs-area"></div>
+
+		<script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+		<script type="text/javascript">
+		var gifVal = ["Banana", "Hello", "No", "Cat"];
+
+		function getGifs(){
+			var gif = $(this).attr("data-name")
+
+			var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + gif + "&api_key=5k8zAyPA82YaBaW2Loi417aw5uAozMGF&limit=5";
+	
+			$.ajax({
+				url:queryURL,
+				method: "GET"
+			})
+	
+			.then(function(response){
+	
+				var results = response.data;
+	
+				for(var i = 0; i < results.length; i++){
+	
+					var gifDiv = $("<div>");
+	
+					var p = $("<p>").text("Rating: " + results[i].rating);
+	
+					var gifImage = $("<img>");
+	
+					gifImage.attr("src", results[i].images.fixed_height_still.url);
+	
+					gifImage.attr("data-still", results[i].images.fixed_height_still.url);
+	
+					gifImage.attr("data-animate", results[i].images.fixed_height.url);
+	
+					gifImage.attr("data-state", "still");
+	
+					gifImage.addClass("pic");
+	
+					gifDiv.append(p);
+					gifDiv.append(gifImage);
+	
+					$("#gifs-area").prepend(gifDiv);
+				}
+			});
+		}
+
+		function createButtons(){
+			$("#buttons-area").empty();
+
+			for(var i = 0; i < gifVal.length; i++){
+
+				var a = $("<button>");
+
+				a.addClass("gifBtn");
+
+				a.attr("data-name", gifVal[i]);
+
+				a.text(gifVal[i]);
+
+				$("#buttons-area").append(a);
+			}
+		}
+
+		$("#addGif").on("click", function(event){
+			event.preventDefault();
+
+			var gifA = $("#gifAdd").val().trim();
+
+			gifVal.push(gifA);
+			
+			createButtons();
+		});
+
+		$(document).on("click", ".gifBtn", getGifs);
+
+		$(document).on("click", ".pic", function(){
+
+			var state = $(this).attr("data-state");
+
+			if(state === "still"){
+				$(this).attr("src", $(this).attr("data-animate"));
+				$(this).attr("data-state", "animate");
+			} else{
+				$(this).attr("src", $(this).attr("data-still"));
+				$(this).attr("data-state", "still");
+			}
+		});
+
+		createButtons();
+		</script>
+	</div>
+	
+</body>
+</html>
